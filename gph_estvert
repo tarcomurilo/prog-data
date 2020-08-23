@@ -1,0 +1,66 @@
+""" 
+Gera a estratificação vertical da floresta com base na média e desvio-padrão
+"""
+import matplotlib.pyplot as mt
+from matplotlib.lines import Line2D as l2d
+import numpy as np
+
+def grp_estvert(alt, color_inf="#227722", color_med="#77DD77", color_sup= "#999955"):
+    """Retorna o gráfico da estrutura horizontal de uma floresta
+    Como usar: passar a lista contendo: [número da árvore, altura]
+    A função calcula média e desvio padrão e classifica as alturas conforme o estrato:
+    Média - desvio = inferior
+    Média + desvio = superior
+    As demais = médio
+    """
+    mt.rcParams["figure.figsize"] = (11,6)
+    if len(alt) < 140:
+        linwid = 2
+    else:
+        linwid = 1
+
+    alt_med = np.mean([x for _, x in alt])
+    alt_std = np.std([x for _, x in alt])
+    alt_max = np.max([x for _, x in alt])
+
+    for j in alt:
+        if j[1] < alt_med - alt_std:
+            alt[j[0]][0] = 0
+        elif j[1] >= alt_med + alt_std:
+            alt[j[0]][0] = 2
+        else:
+            alt[j[0]][0] = 1
+
+    #data = [[i, alt] for i in alt]
+
+    mt.ylim(0, alt_max + 2)
+    pos = 0
+    color="#000000"
+    for alt in alt:
+        if alt[0] == 0:
+            color = color_inf
+        if alt[0] == 1:
+            color = color_med
+        if alt[0] == 2:
+            color = color_sup
+        mt.vlines(pos+1, 0, alt[1], colors=color, linewidth=linwid)
+        pos += 1
+
+    mt.title("Estrutura Vertical")
+    mt.ylabel("Altura")
+
+    cstLines=[l2d([0], [0], color=color_inf, linewidth=2),
+              l2d([0], [0], color=color_med, linewidth=2),
+              l2d([0], [0], color=color_sup, linewidth=2)]
+
+    ax = mt.subplot()
+    "lines = ax.plot(alt)"
+    ax.legend(cstLines, ["Estrato Superior", "Estrato Médio", "Estrato Inferior"], loc="lower center", bbox_to_anchor=(0.48,-0.35))
+    mt.subplots_adjust(bottom=0.25)
+    return mt
+
+alts = [[x, np.round(np.random.rand() * 15 + 2, 2)] for x in range(1000)]
+
+ms = grp_estvert(alts, color_inf="#FF0000", color_med="#00FF00")
+
+ms.show()
