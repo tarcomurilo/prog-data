@@ -1,0 +1,70 @@
+"""
+Extrai as coordenadas geograficas de todas as fotos com o formato 'xxx.jpg' em que xxx é o número da foto
+salva tudo em coord.txt
+"""
+
+import exifread
+
+pasta = "D:\\Onedrive\\Z - TM Consultoria Ambiental\\1A - Projetos\\TM2008-05 - Fiat\\02 - Desenvolvimento\\Fotos\\Fotos Coordenadas\\"
+
+pasta = input("Digite o endereço da pasta (Formato: x:\\pasta\\subpasta\\):")
+
+i = 0
+lat = ""
+lon = ""
+fisopen = False
+
+try:
+    f = open(pasta + "coord.txt", "w")
+
+    f.write("{0};{1};{2}\n".format("foto", "latitude", "longitude"))
+    f.close()
+
+    f = open(pasta + "coord.txt", "a")
+
+except:
+    fisopen = False
+else:
+    fisopen = True
+
+while fisopen and (i < 350):
+
+    try:
+        file = open(pasta + str(i) + ".jpg", 'rb')
+
+        lat = exifread.process_file(file)["GPS GPSLatitude"]
+        lon = exifread.process_file(file)["GPS GPSLongitude"]
+
+    except:
+        pass
+    else:
+        lat = str(lat).split(",")
+        lon = str(lon).split(",")
+
+        lat[0] = int(lat[0].replace("[", ""))
+        lat[1] = int(lat[1].replace(" ", "")) / 60
+        lat[2] = lat[2].replace(" ", "")
+        lat[2] = lat[2].replace("]", "")
+        lat[2] = lat[2].split("/")
+        lat[2] = int(lat[2][0]) / int(lat[2][1]) / 3600
+        lat = lat[0] + lat[1] + lat[2]
+
+        lon[0] = int(lon[0].replace("[", ""))
+        lon[1] = int(lon[1].replace(" ", "")) / 60
+        lon[2] = lon[2].replace(" ", "")
+        lon[2] = lon[2].replace("]", "")
+        lon[2] = lon[2].split("/")
+        lon[2] = int(lon[2][0]) / int(lon[2][1]) / 3600
+        lon = lon[0] + lon[1] + lon[2]
+
+        print(f'{i}; {lat}; {lon}')
+
+        f.write("{0};{1};{2}\n".format(str(i), str(lat).replace(".",","), str(lon).replace(".",",")))
+
+    finally:
+        i = i + 1
+
+try:
+     f.close()
+except:
+     pass
