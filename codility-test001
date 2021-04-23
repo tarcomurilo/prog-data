@@ -1,0 +1,34 @@
+# Codility TEST 1: Cake Factory
+
+def solution(N, K, A, B, C):
+    # write your code in Python 3.6
+
+    if N > 100000: #limit the N
+        N = 100000
+    
+    Y = [[] for i in range(N)] #construct the cake form empty
+
+    for flav in range(len(C)): #start the putting flavor list
+        row = 0
+            
+        while row < N: #start putting flavor chooser
+              
+            if row >= A[flav]-1 and row <= B[flav]-1: #verify if theres a cake
+                Y[row].append(C[flav])
+     
+            row = row + 1
+    
+    cnt = 0 #starting to count how many cakes are good
+    for row in Y:
+        tst = 0
+        for i in row:
+            tst = tst + 1
+           
+            if tst != i:
+                break
+        
+            if i == len(row):
+                cnt = cnt + 1
+            
+    return cnt #return the number of good cakes
+    
